@@ -7,7 +7,7 @@ from .schema import AssignmentSchema
 principal_assignments_resources = Blueprint('principal_assignments_resources', __name__)
 
 
-@principal_assignments_resources.route('/assignments', methods=['GET'], strict_slashes=False)
+@principal_assignments_resources.route('/teachers', methods=['GET'], strict_slashes=False)
 @decorators.authenticate_principal
 def list_submitted_graded_assignments(p):
     """Returns list of assignments"""

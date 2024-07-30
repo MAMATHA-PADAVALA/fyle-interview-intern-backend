@@ -1,3 +1,4 @@
+from xml.dom import ValidationErr
 from flask import Blueprint,jsonify
 from core import db
 from core.apis import decorators
@@ -23,9 +24,9 @@ def list_assignments(p):
 def upsert_assignment(p, incoming_payload):
     """Create or Edit an assignment"""
     assignment = AssignmentSchema().load(incoming_payload)
-    
+
     """check if content is None"""
-    if assignment.get('content') is None:
+    if assignment.content is None:
         return jsonify({"error": "Content cannot be null"}), 400
 
     assignment.student_id = p.student_id

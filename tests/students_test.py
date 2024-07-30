@@ -61,6 +61,10 @@ def test_post_assignment_student_1(client, h_student_1):
 
 
 def test_submit_assignment_student_1(client, h_student_1):
+    
+    """
+    Update the state of assignment to SUBMITTED in submit method of Assignment
+    """
     response = client.post(
         '/student/assignments/submit',
         headers=h_student_1,

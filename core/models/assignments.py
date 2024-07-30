@@ -91,7 +91,7 @@ class Assignment(db.Model):
         grades = [grade.value for grade in GradeEnum]
         if grade not in grades:
             raise ValidationErr(400,'invalid grade')
-
+        
         assignment.grade = grade
         assignment.state = AssignmentStateEnum.GRADED
         db.session.flush()

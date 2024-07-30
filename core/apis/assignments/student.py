@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint,jsonify
 from core import db
 from core.apis import decorators
 from core.apis.responses import APIResponse
@@ -23,6 +23,11 @@ def list_assignments(p):
 def upsert_assignment(p, incoming_payload):
     """Create or Edit an assignment"""
     assignment = AssignmentSchema().load(incoming_payload)
+    
+    """check if content is None"""
+    if assignment.get('content') is None:
+        return jsonify({"error": "Content cannot be null"}), 400
+
     assignment.student_id = p.student_id
 
     upserted_assignment = Assignment.upsert(assignment)

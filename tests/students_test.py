@@ -28,7 +28,10 @@ def test_post_assignment_null_content(client, h_student_1):
     """
     failure case: content cannot be null
     """
-
+    """
+    fixed by adding an if condition to check whether the content is null
+    if the content is null, return status code 400
+    """
     response = client.post(
         '/student/assignments',
         headers=h_student_1,

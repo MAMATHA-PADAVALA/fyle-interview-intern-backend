@@ -1,4 +1,5 @@
 import enum
+from xml.dom import ValidationErr
 from core import db
 from core.apis.decorators import AuthPrincipal
 from core.libs import helpers, assertions
@@ -86,6 +87,10 @@ class Assignment(db.Model):
         assignment = Assignment.get_by_id(_id)
         assertions.assert_found(assignment, 'No assignment with this id was found')
         assertions.assert_valid(grade is not None, 'assignment with empty grade cannot be graded')
+        
+        grades = [grade.value for grade in GradeEnum]
+        if grade not in grades:
+            raise ValidationErr(400,'invalid grade')
 
         assignment.grade = grade
         assignment.state = AssignmentStateEnum.GRADED

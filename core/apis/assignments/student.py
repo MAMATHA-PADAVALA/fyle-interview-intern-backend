@@ -1,4 +1,5 @@
 from xml.dom import ValidationErr
+from core.libs.exceptions import FyleError
 from flask import Blueprint,jsonify
 from core import db
 from core.apis import decorators
@@ -30,7 +31,7 @@ def upsert_assignment(p, incoming_payload):
         return jsonify({"error": "Content cannot be null"}), 400
 
     assignment.student_id = p.student_id
-
+    
     upserted_assignment = Assignment.upsert(assignment)
     db.session.commit()
     upserted_assignment_dump = AssignmentSchema().dump(upserted_assignment)
@@ -42,13 +43,17 @@ def upsert_assignment(p, incoming_payload):
 @decorators.authenticate_principal
 def submit_assignment(p, incoming_payload):
     """Submit an assignment"""
-    submit_assignment_payload = AssignmentSubmitSchema().load(incoming_payload)
+    
+    try:
+        submit_assignment_payload = AssignmentSubmitSchema().load(incoming_payload)
 
-    submitted_assignment = Assignment.submit(
-        _id=submit_assignment_payload.id,
-        teacher_id=submit_assignment_payload.teacher_id,
-        auth_principal=p
-    )
-    db.session.commit()
-    submitted_assignment_dump = AssignmentSchema().dump(submitted_assignment)
-    return APIResponse.respond(data=submitted_assignment_dump)
+        submitted_assignment = Assignment.submit(
+            _id=submit_assignment_payload.id,
+            teacher_id=submit_assignment_payload.teacher_id,
+            auth_principal=p
+        )
+        db.session.commit()
+        submitted_assignment_dump = AssignmentSchema().dump(submitted_assignment)
+        return APIResponse.respond(data=submitted_assignment_dump)
+    except FyleError as e:
+        return jsonify({'error': 'FyleError', 'message': e.message}), 400

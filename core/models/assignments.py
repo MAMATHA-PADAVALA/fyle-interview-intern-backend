@@ -96,3 +96,15 @@ class Assignment(db.Model):
     def get_all_submitted_graded_assignments(cls):
         return cls.filter(cls.state==AssignmentStateEnum.GRADED,
                           cls.grade.isnot(None)).all()
+    
+    @classmethod
+    def grade_or_regrade(cls, _id, principal_id, auth_principal: AuthPrincipal):
+        assignment = Assignment.get_by_id(_id)
+        assertions.assert_found(assignment, 'No assignment with this id was found')
+        assertions.assert_valid(assignment.student_id == auth_principal.student_id, 'This assignment belongs to some other student')
+        assertions.assert_valid(assignment.content is not None, 'assignment with empty content cannot be submitted')
+
+        assignment.principal_id = principal_id
+        db.session.flush()
+
+        return assignment

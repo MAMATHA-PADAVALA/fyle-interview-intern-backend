@@ -70,7 +70,7 @@ def test_get_assignments_in_graded_state_for_each_student():
         expected_result = [(1, 3)]
 
         # Execute the SQL query and compare the result with the expected result
-        with open('number_of_graded_assignments_for_each_student.sql', encoding='utf8') as fo:
+        with open('tests/SQL/number_of_graded_assignments_for_each_student.sql', encoding='utf8') as fo:
             sql = fo.read()
 
         # Execute the SQL query compare the result with the expected result
@@ -91,7 +91,7 @@ def test_get_grade_A_assignments_for_teacher_with_max_grading():
         db.session.commit()
 
         # Read the SQL query from a file
-        with open('count_grade_A_assignments_by_teacher_with_max_grading.sql', encoding='utf8') as fo:
+        with open('tests/SQL/count_grade_A_assignments_by_teacher_with_max_grading.sql', encoding='utf8') as fo:
             sql = fo.read()
 
 

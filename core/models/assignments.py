@@ -6,7 +6,7 @@ from core.libs import helpers, assertions
 from core.libs.exceptions import FyleError
 from core.models.teachers import Teacher
 from core.models.students import Student
-from sqlalchemy.types import Enum as BaseEnum
+from sqlalchemy.types import Enum as BaseEnum # type: ignore
 
 
 class GradeEnum(str, enum.Enum):
@@ -82,20 +82,22 @@ class Assignment(db.Model):
 
     @classmethod
     def mark_grade(cls, _id, grade, auth_principal: AuthPrincipal):
-        assignment = Assignment.get_by_id(_id)
+        assignment = cls.get_by_id(_id)
         assertions.assert_found(assignment, 'No assignment with this id was found')
         assertions.assert_valid(grade is not None, 'assignment with empty grade cannot be graded')
         
-        grades = [grade.value for grade in GradeEnum]
+        grades = [g.value for g in GradeEnum]
         if grade not in grades:
-            raise ValidationErr(400,'invalid grade')
-        if cls.state!=AssignmentStateEnum.SUBMITTED:
-            raise FyleError(400,'not submitted')
+            raise ValidationErr(400, 'invalid grade')
+        if assignment.state != AssignmentStateEnum.SUBMITTED:
+            raise FyleError(400, 'not submitted')
+
         assignment.grade = grade
         assignment.state = AssignmentStateEnum.GRADED
         db.session.flush()
 
         return assignment
+
 
     @classmethod
     def get_assignments_by_student(cls, student_id):

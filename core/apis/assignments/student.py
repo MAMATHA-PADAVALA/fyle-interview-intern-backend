@@ -46,7 +46,7 @@ def submit_assignment(p, incoming_payload):
     
     try:
         submit_assignment_payload = AssignmentSubmitSchema().load(incoming_payload)
-
+        
         submitted_assignment = Assignment.submit(
             _id=submit_assignment_payload.id,
             teacher_id=submit_assignment_payload.teacher_id,
@@ -57,3 +57,4 @@ def submit_assignment(p, incoming_payload):
         return APIResponse.respond(data=submitted_assignment_dump)
     except FyleError as e:
         return jsonify({'error': 'FyleError', 'message': e.message}), 400
+

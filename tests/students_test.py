@@ -61,15 +61,29 @@ def test_post_assignment_student_1(client, h_student_1):
 
 
 def test_submit_assignment_student_1(client, h_student_1):
-    
     """
     Update the state of assignment to SUBMITTED in submit method of Assignment
     """
+    # Create an assignment in DRAFT state
+    response = client.post(
+        '/student/assignments',
+        headers=h_student_1,
+        json={
+            'content': 'some text'
+        }
+    )
+    assert response.status_code == 200
+    data = response.json['data']
+    assignment_id = data['id']
+    assert data['state'] == 'DRAFT'
+    assert data['student_id'] == 1
+
+    # Now submit the assignment
     response = client.post(
         '/student/assignments/submit',
         headers=h_student_1,
         json={
-            'id': 2,
+            'id': assignment_id,
             'teacher_id': 2
         })
 
@@ -81,13 +95,37 @@ def test_submit_assignment_student_1(client, h_student_1):
     assert data['state'] == 'SUBMITTED'
     assert data['teacher_id'] == 2
 
-
 def test_assignment_resubmit_error(client, h_student_1):
+    # Create an assignment in DRAFT state
+    response = client.post(
+        '/student/assignments',
+        headers=h_student_1,
+        json={
+            'content': 'some text'
+        }
+    )
+    assert response.status_code == 200
+    data = response.json['data']
+    assignment_id = data['id']
+    assert data['state'] == 'DRAFT'
+    assert data['student_id'] == 1
+
+    # Submit the assignment to set it to SUBMITTED state
     response = client.post(
         '/student/assignments/submit',
         headers=h_student_1,
         json={
-            'id': 2,
+            'id': assignment_id,
+            'teacher_id': 2
+        })
+    assert response.status_code == 200
+
+    # Try to resubmit the same assignment
+    response = client.post(
+        '/student/assignments/submit',
+        headers=h_student_1,
+        json={
+            'id': assignment_id,
             'teacher_id': 2
         })
     error_response = response.json

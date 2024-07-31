@@ -1,7 +1,20 @@
 import pytest
 import json
 from tests import app
+from core import db
 
+@pytest.fixture(scope='module')
+def app():
+    app = create_app('testing')
+    with app.app_context():
+        yield app
+
+@pytest.fixture(scope='module')
+def database(app):
+    db.create_all()
+    yield db
+    db.session.remove()
+    db.drop_all()
 
 @pytest.fixture
 def client():

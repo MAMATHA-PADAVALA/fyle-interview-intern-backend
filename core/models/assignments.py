@@ -84,19 +84,22 @@ class Assignment(db.Model):
     def mark_grade(cls, _id, grade, auth_principal: AuthPrincipal):
         assignment = cls.get_by_id(_id)
         assertions.assert_found(assignment, 'No assignment with this id was found')
-        assertions.assert_valid(grade is not None, 'assignment with empty grade cannot be graded')
-        
+        assertions.assert_valid(grade is not None, 'Assignment with empty grade cannot be graded')
+
         grades = [g.value for g in GradeEnum]
         if grade not in grades:
-            raise ValidationErr(400, 'invalid grade')
-        if assignment.state != AssignmentStateEnum.SUBMITTED:
-            raise FyleError(400, 'not submitted')
-
+            raise ValidationErr(400, 'Invalid grade')
+        
+        # Allow grading or re-grading if the assignment is in SUBMITTED or GRADED state
+        if assignment.state not in [AssignmentStateEnum.SUBMITTED, AssignmentStateEnum.GRADED]:
+            raise FyleError(400, 'Assignment not in a valid state for grading')
+        
         assignment.grade = grade
         assignment.state = AssignmentStateEnum.GRADED
         db.session.flush()
 
         return assignment
+
 
 
     @classmethod
